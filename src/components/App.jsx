@@ -31,21 +31,26 @@ export const App = () => {
   }, []);
 
   useEffect(() => {
+    if (searchValue !== '') { 
+     
     setImages([]);
     setPage(1);
     setIsLoading(true);
 
-    const fetchData = async () => {
-      const response = await axios.get(
-        `?q=${searchValue}&page=1&key=${ApiKey}&image_type=photo&orientation=horizontal&per_page=12`
-      );
-
-      setTimeout(() => {
-        setImages([response.data.hits]);
-        setIsLoading(false);
-      }, 100);
-    };
-    fetchData();
+      axios
+        .get(
+          `?q=${searchValue}&page=1&key=${ApiKey}&image_type=photo&orientation=horizontal&per_page=12`
+        )
+        .then(function (response) {
+          setImages(response.data.hits);
+        })
+        .catch(function (error) {
+          console.error(error);
+        })
+        .finally(function () {
+          setIsLoading(false);
+        });
+    }
   }, [searchValue]);
 
   const searchImages = value => {
@@ -66,18 +71,22 @@ export const App = () => {
     setPage(prev => prev + 1);
     setIsLoading(true);
 
-    const fetchData = async () => {
-      const response = await axios.get(
+    axios
+      .get(
         `?q=${searchValue}&page=${page}&key=${ApiKey}&image_type=photo&orientation=horizontal&per_page=12`
-      );
-
-      setTimeout(() => {
+      )
+      .then(function (response) {
         setImages([...images, ...response.data.hits]);
+      })
+      .catch(function (error) {
+        console.error(error);
+      })
+      .finally(function () {
         setIsLoading(false);
-      }, 100);
-    };
-    fetchData();
-    scrollDown();
+        scrollDown();
+      });
+
+    
   };
 
   const openModal = e => {
